@@ -11,7 +11,7 @@ app.use(express.json());
 const userRoute = require('./routes/userRoute'); 
 
 
-
+ 
 // Custom middlewares
 
 app.use('/api/v1/users',userRoute)

@@ -43,6 +43,8 @@ const userSchema = new mongoose.Schema({
             message:"Password and Confirm Password are not same"
         }
     },
+    OTP:Number,
+    OTPExpiresTime:Date,
     passwordChangedAt:Date
 
 })
@@ -95,6 +97,15 @@ userSchema.methods.createPasswordResetToken = function(){
     this.passwordResetExpires = Date.now() + 10 * 60 * 1000; //ms
 
     return resetToken
+}
+
+userSchema.methods.generateOTP = function(){
+    const OTP = Math.floor(Math.random() * 1000 + 1000);
+    const timeToExpires = 2*60*1000;
+    const expires = Date.now() + timeToExpires;
+    this.OTPExpiresTime = expires;
+    this.OTP = OTP;
+    return OTP
 }
 
 

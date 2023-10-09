@@ -10,7 +10,7 @@ const signToken = id => {
 }
 // Sign Up
 const signUp = async(req,res) => {
-    try {
+    try { 
     
         const {name,email,photo,password,passwordConfirm,passwordChangedAt} = req.body;
 
@@ -172,25 +172,31 @@ const forgetPassword = async(req,res) => {
         }
 
         // Generate random token
-
-        const resetToken = user.createPasswordResetToken();
+        // For now dont using crypto module
+        // const resetToken = user.createPasswordResetToken();
         
         await user.save({validateBeforeSave:false});
         // sends it to user email
-        const resetUrl = `${req.protocol}://${req.get('host')}/api/vi/users/resetPassword/${resetToken}`
+        // const resetUrl = `${req.protocol}://${req.get('host')}/api/vi/users/resetPassword/${resetToken}`
 
-        const message = `Forget Your Password? Click on the given link to set your new Password: ${resetUrl}. If  you dont want to reset your password.Please ignore this email.`;
- 
+        // const message = `Forget Your Password? Click on the given link to set your new Password: ${resetUrl}. If  you dont want to reset your password.Please ignore this email.`;
+        
+        const OTP = user.generateOTP();
+        const message = `Forget Your Password? You can use below given OTP to reset Your Password!
+        
+        You OTP is : ${OTP}
+        `
+        await user.save({validateBeforeSave:false});
         try { 
             await sendEmail({  
                 email:user.email,
-                subject:"Password Reset Link (Only Valid for 10 mints)",
+                subject:"Password Reset OTP(Only Valid for 10 mints)",
                 message
             })
     
             res.status(200).json({
                 status:"Success",
-                message:"Token sent to an email. Successfully"
+                message:"OTP sent to an email. Successfully"
             }) 
           
         } catch (error) {
@@ -206,10 +212,52 @@ const forgetPassword = async(req,res) => {
         res.status(400).json({Error:error.message});
     }
 }
-
+// Using OTP verification
 const resetPassword = async(req,res) => {
     try {
-        const token = req.params.token;
+        const {email,userOTP,password,confirmPassword} = req.body;
+
+        // Check User using email if exist
+
+        const user = await User.findOne({email})
+        
+        if(!user){
+            return res.status(200).json({Error:"Invalid User Email!"});
+        }
+
+        // If User Exist get OTP we save in DB during OTP creation
+
+        
+
+        let realOTP = user.OTP;
+        let expiresTime = user.OTPExpiresTime;
+
+        if(!realOTP){
+            return res.status(403).json({Error:"You can use One OTP only for One time.Generate New OTP to reset Password Again"});
+        }
+        // Check Expires time
+
+        let date = Date.now();
+
+        if(date > parseInt(expiresTime)){
+            return res.status(401).json({Error:"Your OTP Expires. Use new OTP to reset Your Password"});
+        }
+        // Verify OTP
+        if(userOTP === realOTP){
+            user.OTP = undefined;
+            user.OTPExpiresTime = undefined;
+            user.password = password;
+            user.passwordConfirm = confirmPassword;
+            await user.save();
+
+            return res.status(200).json({
+                
+                Status:"Success",
+                message:"Your password Has been reset.Sign in with Your new Password"
+        })
+        }
+
+        // const token = req.params.token;
         // console.log(token)
     } catch (error) {
         res.status(400).json({Error:error.message});

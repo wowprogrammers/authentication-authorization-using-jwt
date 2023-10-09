@@ -1,0 +1,22 @@
+{
+  "name": "authentication-using-jwt",
+  "version": "1.0.0",
+  "description": "In this project we are going to Practice Authentication using  One of the most Well Know technique JSON web tokens",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js"
+  },
+  "author": "Waleed Bukhari @wowprogrammers",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.6.0",
+    "nodemailer": "^6.9.5",
+    "nodemon": "^3.0.1",
+    "validator": "^13.11.0"
+  }
+}

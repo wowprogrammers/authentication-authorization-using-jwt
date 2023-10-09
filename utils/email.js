@@ -8,7 +8,7 @@ const sendEmail = async options => {
         port:2525, 
         auth:{
             user:process.env.Email_User,
-            password:process.env.Password_User 
+            pass:process.env.Password_User 
         }   
     });
     // Define the email options 
@@ -22,7 +22,7 @@ const sendEmail = async options => {
 
         // Actually send the email
         await transporter.sendMail(mailOptions)
-        console.log('Email sent successfully');
+        // console.log('Email sent successfully');
 
 
     } catch (error) {
